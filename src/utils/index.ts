@@ -22,7 +22,7 @@ export const getFilePaths = (folderPath: string, basePath = folderPath): string[
         if (fs.statSync(fullFilePath).isDirectory()) {
             response = response.concat(getFilePaths(fullFilePath, basePath));
         } else {
-            response.push(path.relative(basePath, fullFilePath)); // ✅ relative
+            response.push(path.relative(basePath, fullFilePath)); 
         }
     });
 
