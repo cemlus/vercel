@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
 app.post('/deploy', async (req, res) => {
     const { repoUrl } = req.body;
     const id = generateRandomID();
-
+    // const id = "ackw4";
     if (!repoUrl) return res.status(400).json({ error: "Missing repoUrl" });
     const SimpleGit = simpleGit();
 
@@ -32,11 +32,16 @@ app.post('/deploy', async (req, res) => {
 
     const files = getAllFiles(`dist/output/${id}`)
     try {
-        files.forEach(async (file) => {
-            await uploadFileToS3(file.slice(dirname.length + 1), file);
-        })
+        const uploadPromises = files.map((file) => {
+            const s3Key = file.split(`dist/output/${id}/`)[1];
+            // console.log(s3Key);
 
-        publisher.lPush("build-queue", id);
+            if (!s3Key) return;
+            return uploadFileToS3(`st/output/${id}/${s3Key}`, file);
+        });
+        await Promise.all(uploadPromises);
+
+        await publisher.lPush("build-queue", id);
 
         res.json({
             message: `here's the id for the project:`,
