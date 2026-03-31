@@ -1,10 +1,12 @@
-import { S3Client, ListObjectsV2Command, GetObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, ListObjectsV2Command, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { env } from './config.js';
 import path from 'node:path';
 import fs from 'fs';
 import { type Readable } from 'node:stream';
 import { createWriteStream } from 'node:fs';
+import mime from "mime-types";
 import { pipeline } from 'node:stream/promises';
+import { getAllFiles } from './utils.js';
 
 const s3 = new S3Client({
     region: env.AWS_REGION,
@@ -50,6 +52,44 @@ export async function downloadFolderFromS3(prefix: string, localBaseDir: string)
     } catch (err) {
         console.error("Error during download:", err);
         throw err;
+    }
+
+}
+
+export async function uploadFileToS3(fileName: string, localFilePath: string, contentType: string) {
+    const fileContent = fs.readFileSync(localFilePath);
+    const response = await s3.send(
+        new PutObjectCommand({
+            Bucket: env.S3_BUCKET_NAME,
+            Body: fileContent,
+            Key: fileName,
+            ContentType: contentType
+        })
+    );
+
+    console.log(response);
+}
+
+export async function deployBuiltFilesToS3(buildPath: string, projectId: string) {
+    const finalFiles = getAllFiles(buildPath);
+    try {
+        const uploadPromises = finalFiles.map((file) => {
+            const relativePath = path.relative(buildPath, file);
+            // return uploadFileToS3(`st/output/${id}/${s3Key}`, file);
+            const s3Key = `${projectId}/${relativePath}`;
+            const contentType = mime.lookup(file) || "application/octet-stream";
+
+            return uploadFileToS3(`st/deployed/${s3Key}`, file, contentType);
+        });
+
+        await Promise.all(uploadPromises);
+
+        // remove the file from local storage after deploying
+        await fs.promises.rm(path.join(process.cwd(), `src/tmp/${projectId}`), { recursive: true });
+
+        console.log(`deployed files sent to S3 of the project ID: ${projectId}`);
+    } catch (error) {
+        console.error(`error while sending Built files to S3`)
     }
 
 }

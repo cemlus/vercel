@@ -13,11 +13,17 @@ async function main () {
         const res = await subscriber.brPop(
             'build-queue', 0
         );
-        const projectId = res?.element;
-        if(!projectId) return console.error(`Queue is empty`)
-        const sharedWorkspace = `/tmp/${projectId}`;
-        await downloadFolderFromS3(`st/${projectId}`, sharedWorkspace);
-        const build = await buildInContainer(projectId);
+        if(!res) return console.error(`queue is empty`)
         
+        const projectId = res.element;
+        console.log(`processing project: ${projectId}`);
+        const sharedWorkspace = `src/tmp/${projectId}`;
+        await downloadFolderFromS3(`st/output/${projectId}/`, sharedWorkspace);
+        await buildInContainer(projectId);
+        // the built code has successfully reached the src/tmp/projectId/dist folder
+        console.log(`successfully built: ${projectId}`);
     }
+    // const projectId = "ackw4";
+    // await buildInContainer(projectId);
 }
+main();
