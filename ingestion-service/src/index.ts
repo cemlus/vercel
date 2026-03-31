@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
 app.post('/deploy', async (req, res) => {
     const { repoUrl } = req.body;
     const id = generateRandomID();
-    // const id = "ackw4";
+    // const id = "magcu";
     if (!repoUrl) return res.status(400).json({ error: "Missing repoUrl" });
     const SimpleGit = simpleGit();
 
