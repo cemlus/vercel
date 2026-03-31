@@ -16,6 +16,7 @@ async function main () {
         if(!res) return console.error(`queue is empty`)
         
         const projectId = res.element;
+        // const projectId = "kgnig";
         console.log(`processing project: ${projectId}`);
         const sharedWorkspace = `src/tmp/${projectId}`;
         await downloadFolderFromS3(`st/output/${projectId}/`, sharedWorkspace);
@@ -23,7 +24,5 @@ async function main () {
         // the built code has successfully reached the src/tmp/projectId/dist folder
         console.log(`successfully built: ${projectId}`);
     }
-    // const projectId = "ackw4";
-    // await buildInContainer(projectId);
 }
 main();

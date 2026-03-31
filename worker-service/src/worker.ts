@@ -6,7 +6,8 @@ import { deployBuiltFilesToS3 } from "./s3.js";
 const execPromise = promisify(exec);
 
 export async function buildInContainer(projectId: string) {
-    const relativeWorkspacePath = `src/tmp/${projectId}/ingestion-service`;
+    // # make sure that this path is the one where the package.json for the repository exists (for now this is jugaad)
+    const relativeWorkspacePath = `src/tmp/${projectId}/frontend`;
     console.log(relativeWorkspacePath);
     const absolutePath = path.resolve(relativeWorkspacePath);
     console.log(absolutePath);
@@ -36,6 +37,7 @@ export async function buildInContainer(projectId: string) {
 
         // after the container is gone, the built files are sitting in /tmp/{projectId}/dist
         const buildPath = path.join(absolutePath, "dist");
+
         await deployBuiltFilesToS3(buildPath, projectId);
 
         return true;

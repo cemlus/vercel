@@ -89,7 +89,7 @@ export async function deployBuiltFilesToS3(buildPath: string, projectId: string)
 
         console.log(`deployed files sent to S3 of the project ID: ${projectId}`);
     } catch (error) {
-        console.error(`error while sending Built files to S3`)
+        console.error(`error while sending Built files to S3`, error)
     }
 
 }
