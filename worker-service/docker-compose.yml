@@ -1,0 +1,11 @@
+version: "3.10"
+services:
+  worker:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      # remote control for the host docker containers runtime for a situation of DooD i.e. Docker-Out-Of-Docker
+      - /var/run/docker.sock:/var/run/docker.sock
+      # the shared directory
+      - /tmp/:/tmp/
