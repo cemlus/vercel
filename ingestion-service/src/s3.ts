@@ -1,6 +1,6 @@
 import fs from "fs";
 import { PutObjectCommand, S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
-import { env } from "./config";
+import { env } from "./config.js";
 
 export const s3 = new S3Client({
   region: env.AWS_REGION,

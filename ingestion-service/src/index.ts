@@ -30,7 +30,7 @@ app.post('/deploy', async (req, res) => {
 
     await SimpleGit.clone(repoUrl, `dist/output/${id}`);
 
-    const files = getAllFiles(`dist/output/${id}`)
+    const files = getAllFiles(`dist/output/${id}/frontend`)
     try {
         const uploadPromises = files.map((file) => {
             const s3Key = file.split(`dist/output/${id}/`)[1];
